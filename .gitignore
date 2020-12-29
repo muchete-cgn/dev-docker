@@ -1,0 +1,6 @@
+.env
+.idea/*
+.docker/mariadb
+.docker/*/logs
+app/*
+!app/index.php

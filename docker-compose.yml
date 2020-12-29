@@ -1,0 +1,37 @@
+version: '3.6'
+services:
+  php:
+    build: .docker/php
+    expose:
+      - '9000'
+    volumes:
+      - ./.docker/php/logs:/var/log
+      - ./app:/var/www
+    environment:
+      PHP_XDEBUG_ENABLED: 1
+      XDEBUG_CONFIG: remote_host=<YOUR_IP_ADDRESS>
+    user: "${UID}:${GID}"
+
+  web:
+    image: nginx:1.19-alpine
+    ports:
+      - '8080:80'
+    depends_on:
+      - php
+    volumes:
+        - ./.docker/nginx/logs:/var/log/nginx
+        - ./app:/var/www
+        - ./.docker/nginx/sites-enabled/:/etc/nginx/sites-enabled
+        - ./.docker/nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+
+  mariadb:
+      image: mariadb:10.5
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: mariadb
+        MYSQL_USER: local
+        MYSQL_PASSWORD: local
+      ports:
+        - "33066:3306"
+      volumes:
+        - ./.docker/mariadb:/var/lib/mysql
